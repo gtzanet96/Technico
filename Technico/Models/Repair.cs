@@ -13,7 +13,6 @@ public class Repair
     public DateTime ScheduledDate { get; set; }
     public string Type { get; set; } = string.Empty; // type of repair: (Painting, Insulation, Frames, plumbing, electrical work)
     public string Description { get; set; } = string.Empty;
-    public string Address { get; set; } = string.Empty; // repair address
     public string Status { get; set; } = "Pending"; // status: (Pending, In Progress, Complete)
     [Precision(8, 2)] public decimal Cost { get; set; }
 
