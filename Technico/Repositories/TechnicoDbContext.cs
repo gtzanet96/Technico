@@ -13,7 +13,6 @@ public class TechnicoDbContext : DbContext //εδώ ορίζουμε ποια α
     public DbSet<PropertyOwner> PropertyOwner { get; set; }
     public DbSet<PropertyItem> PropertyItem { get; set; }
     public DbSet<Repair> Repair { get; set; }
-    public DbSet<User> User { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

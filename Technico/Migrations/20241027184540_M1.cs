@@ -28,6 +28,26 @@ namespace Technico.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PropertyOwner",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    VAT = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserType = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PropertyOwner", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "User",
                 columns: table => new
                 {
@@ -40,30 +60,6 @@ namespace Technico.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_User", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PropertyOwner",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    VAT = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PropertyOwner", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PropertyOwner_User_UserId",
-                        column: x => x.UserId,
-                        principalTable: "User",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -127,11 +123,6 @@ namespace Technico.Migrations
                 column: "PropertyOwnersId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PropertyOwner_UserId",
-                table: "PropertyOwner",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Repair_PropertyItemId",
                 table: "Repair",
                 column: "PropertyItemId");
@@ -152,13 +143,13 @@ namespace Technico.Migrations
                 name: "Repair");
 
             migrationBuilder.DropTable(
+                name: "User");
+
+            migrationBuilder.DropTable(
                 name: "PropertyItem");
 
             migrationBuilder.DropTable(
                 name: "PropertyOwner");
-
-            migrationBuilder.DropTable(
-                name: "User");
         }
     }
 }

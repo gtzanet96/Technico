@@ -12,8 +12,8 @@ using Technico.Repositories;
 namespace Technico.Migrations
 {
     [DbContext(typeof(TechnicoDbContext))]
-    [Migration("20241027181457_M1")]
-    partial class M1
+    [Migration("20241027184700_M2")]
+    partial class M2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -79,6 +79,10 @@ namespace Technico.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -87,20 +91,23 @@ namespace Technico.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("VAT")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("PropertyOwner");
                 });
@@ -147,31 +154,6 @@ namespace Technico.Migrations
                     b.ToTable("Repair");
                 });
 
-            modelBuilder.Entity("Technico.Models.User", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("User");
-                });
-
             modelBuilder.Entity("PropertyItemPropertyOwner", b =>
                 {
                     b.HasOne("Technico.Models.PropertyItem", null)
@@ -185,17 +167,6 @@ namespace Technico.Migrations
                         .HasForeignKey("PropertyOwnersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Technico.Models.PropertyOwner", b =>
-                {
-                    b.HasOne("Technico.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Technico.Models.Repair", b =>
