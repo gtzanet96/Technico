@@ -12,6 +12,22 @@ namespace Technico.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "PropertyItem",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PropertyIdentificationNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PropertyAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    YearOfConstruction = table.Column<int>(type: "int", nullable: false),
+                    PropertyType = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PropertyItem", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "User",
                 columns: table => new
                 {
@@ -51,23 +67,24 @@ namespace Technico.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PropertyItem",
+                name: "PropertyItemPropertyOwner",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    PropertyIdentificationNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PropertyAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    YearOfConstruction = table.Column<int>(type: "int", nullable: false),
-                    PropertyType = table.Column<int>(type: "int", nullable: false),
-                    PropertyOwnerId = table.Column<int>(type: "int", nullable: false)
+                    PropertiesId = table.Column<int>(type: "int", nullable: false),
+                    PropertyOwnersId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PropertyItem", x => x.Id);
+                    table.PrimaryKey("PK_PropertyItemPropertyOwner", x => new { x.PropertiesId, x.PropertyOwnersId });
                     table.ForeignKey(
-                        name: "FK_PropertyItem_PropertyOwner_PropertyOwnerId",
-                        column: x => x.PropertyOwnerId,
+                        name: "FK_PropertyItemPropertyOwner_PropertyItem_PropertiesId",
+                        column: x => x.PropertiesId,
+                        principalTable: "PropertyItem",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PropertyItemPropertyOwner_PropertyOwner_PropertyOwnersId",
+                        column: x => x.PropertyOwnersId,
                         principalTable: "PropertyOwner",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -95,19 +112,19 @@ namespace Technico.Migrations
                         column: x => x.PropertyItemId,
                         principalTable: "PropertyItem",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Repair_PropertyOwner_PropertyOwnerId",
                         column: x => x.PropertyOwnerId,
                         principalTable: "PropertyOwner",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_PropertyItem_PropertyOwnerId",
-                table: "PropertyItem",
-                column: "PropertyOwnerId");
+                name: "IX_PropertyItemPropertyOwner_PropertyOwnersId",
+                table: "PropertyItemPropertyOwner",
+                column: "PropertyOwnersId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PropertyOwner_UserId",
@@ -128,6 +145,9 @@ namespace Technico.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "PropertyItemPropertyOwner");
+
             migrationBuilder.DropTable(
                 name: "Repair");
 

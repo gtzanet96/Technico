@@ -14,8 +14,7 @@ public class PropertyItem
     public int YearOfConstruction { get; set; }
     public PropertyType PropertyType { get; set; } // default το Uncategorized
 
-    public int PropertyOwnerId { get; set; } // αντί για owner vat number
-    public PropertyOwner PropertyOwner { get; set; } // navigation property
+    public List<PropertyOwner> PropertyOwners { get; set; } = []; //ένα property item μπορεί να έχει πολλούς property owners
 
-    public List<Repair> Repairs { get; set; } = [];
+    public List<Repair> Repairs { get; set; } = []; //ένα property item μπορεί να έχει πολλά repairs
 }

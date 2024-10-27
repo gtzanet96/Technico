@@ -22,6 +22,21 @@ namespace Technico.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("PropertyItemPropertyOwner", b =>
+                {
+                    b.Property<int>("PropertiesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PropertyOwnersId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PropertiesId", "PropertyOwnersId");
+
+                    b.HasIndex("PropertyOwnersId");
+
+                    b.ToTable("PropertyItemPropertyOwner");
+                });
+
             modelBuilder.Entity("Technico.Models.PropertyItem", b =>
                 {
                     b.Property<int>("Id")
@@ -38,9 +53,6 @@ namespace Technico.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PropertyOwnerId")
-                        .HasColumnType("int");
-
                     b.Property<int>("PropertyType")
                         .HasColumnType("int");
 
@@ -48,8 +60,6 @@ namespace Technico.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PropertyOwnerId");
 
                     b.ToTable("PropertyItem");
                 });
@@ -159,15 +169,19 @@ namespace Technico.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("Technico.Models.PropertyItem", b =>
+            modelBuilder.Entity("PropertyItemPropertyOwner", b =>
                 {
-                    b.HasOne("Technico.Models.PropertyOwner", "PropertyOwner")
-                        .WithMany("Properties")
-                        .HasForeignKey("PropertyOwnerId")
+                    b.HasOne("Technico.Models.PropertyItem", null)
+                        .WithMany()
+                        .HasForeignKey("PropertiesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PropertyOwner");
+                    b.HasOne("Technico.Models.PropertyOwner", null)
+                        .WithMany()
+                        .HasForeignKey("PropertyOwnersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Technico.Models.PropertyOwner", b =>
@@ -186,13 +200,13 @@ namespace Technico.Migrations
                     b.HasOne("Technico.Models.PropertyItem", "PropertyItem")
                         .WithMany("Repairs")
                         .HasForeignKey("PropertyItemId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Technico.Models.PropertyOwner", "PropertyOwner")
                         .WithMany("Repairs")
                         .HasForeignKey("PropertyOwnerId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("PropertyItem");
@@ -207,8 +221,6 @@ namespace Technico.Migrations
 
             modelBuilder.Entity("Technico.Models.PropertyOwner", b =>
                 {
-                    b.Navigation("Properties");
-
                     b.Navigation("Repairs");
                 });
 #pragma warning restore 612, 618

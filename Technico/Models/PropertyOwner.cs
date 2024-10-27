@@ -18,6 +18,6 @@ public class PropertyOwner
     public User? User { get; set; } // Navigation property for accessing User info
 
     public List<PropertyItem> Properties { get; set; } = [];
-    public List<Repair> Repairs { get; set; } = new List<Repair>();
-    
+    public List<Repair> Repairs { get; set; } = [];
+
 }
