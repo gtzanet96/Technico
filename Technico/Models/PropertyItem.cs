@@ -15,6 +15,5 @@ public class PropertyItem
     public PropertyType PropertyType { get; set; } // default το Uncategorized
 
     public List<PropertyOwner> PropertyOwners { get; set; } = []; //ένα property item μπορεί να έχει πολλούς property owners
-
     public List<Repair> Repairs { get; set; } = []; //ένα property item μπορεί να έχει πολλά repairs
 }

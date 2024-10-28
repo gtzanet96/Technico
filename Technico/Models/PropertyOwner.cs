@@ -22,5 +22,4 @@ public class PropertyOwner
 
     public List<PropertyItem> Properties { get; set; } = [];
     public List<Repair> Repairs { get; set; } = [];
-
 }
