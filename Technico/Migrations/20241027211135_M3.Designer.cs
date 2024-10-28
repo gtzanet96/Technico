@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Technico.Repositories;
 
@@ -11,9 +12,11 @@ using Technico.Repositories;
 namespace Technico.Migrations
 {
     [DbContext(typeof(TechnicoDbContext))]
-    partial class TechnicoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241027211135_M3")]
+    partial class M3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,7 +64,7 @@ namespace Technico.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PropertyItems", (string)null);
+                    b.ToTable("PropertyItem");
                 });
 
             modelBuilder.Entity("Technico.Models.PropertyOwner", b =>
@@ -109,7 +112,7 @@ namespace Technico.Migrations
                     b.HasIndex("VAT")
                         .IsUnique();
 
-                    b.ToTable("PropertyOwners", (string)null);
+                    b.ToTable("PropertyOwner");
                 });
 
             modelBuilder.Entity("Technico.Models.Repair", b =>
@@ -151,7 +154,7 @@ namespace Technico.Migrations
 
                     b.HasIndex("PropertyOwnerId");
 
-                    b.ToTable("Repairs", (string)null);
+                    b.ToTable("Repair");
                 });
 
             modelBuilder.Entity("PropertyItemPropertyOwner", b =>
