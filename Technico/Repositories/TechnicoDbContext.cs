@@ -27,6 +27,11 @@ public class TechnicoDbContext : DbContext //εδώ ορίζουμε ποια α
             .HasIndex(o => o.VAT)
             .IsUnique();
 
+        modelBuilder
+            .Entity<PropertyItem>()
+            .HasIndex(i => i.PropertyIdentificationNumber)
+            .IsUnique();
+
         modelBuilder.Entity<PropertyOwner>().ToTable("PropertyOwners");
         modelBuilder.Entity<PropertyItem>().ToTable("PropertyItems");
         modelBuilder.Entity<Repair>().ToTable("Repairs");
