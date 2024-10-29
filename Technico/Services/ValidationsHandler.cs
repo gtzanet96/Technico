@@ -21,4 +21,15 @@ public static class ValidationsHandler
             return false;
         return true;
     }
+
+    public static bool isValidItem(PropertyItem item)
+    {
+        if (string.IsNullOrWhiteSpace(item.PropertyIdentificationNumber) ||
+            string.IsNullOrWhiteSpace(item.PropertyAddress) ||
+            item.YearOfConstruction <= 0)
+            return false;
+        return true;
+    }
 }
+
+

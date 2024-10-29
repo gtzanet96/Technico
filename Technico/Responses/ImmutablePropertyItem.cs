@@ -12,5 +12,6 @@ public record ImmutablePropertyItem(
     string PropertyIdentificationNumber,
     string PropertyAddress,
     int YearOfConstruction,
-    PropertyType PropertyType
+    PropertyType PropertyType,
+    List<ImmutablePropertyOwnerSummary> CoOwners
 );
