@@ -12,7 +12,7 @@ namespace Technico.Services;
 
 public class PropertyOwnerService
 {
-    /*GDPR requirements are met in the following ways:
+    /* GDPR requirements are met in the following ways:
      - Data Minimization: Συλλέγουμε και επεξεργαζόμαστε μόνο τα απαραίτητα για την υπηρεσία δεδομένων.
        (π.χ δεν ρωτάμε αν ο χρήστης έχει και άλλα ακίνητα εκτός από τα καταχωρημένα, αν έχει παιδιά κτλ)
      - Right to Access: Οι χρήστες έχουν πρόσβαση ανά πάσα στιγμή στα αποθηκευμένα δεδομένα τους (display services)
@@ -23,21 +23,44 @@ public class PropertyOwnerService
      */
 
     private TechnicoDbContext db;
-
     public PropertyOwnerService(TechnicoDbContext db) // dependency injection
     {
         this.db = db;
     }
 
-    //1. The self-registration service
-    public PropertyOwner CreatePropertyOwner(PropertyOwner owner)
-    { 
+    // 1. The self-registration service
+    public PropertyOwnerResponse CreatePropertyOwner(PropertyOwner owner)
+    {
+        // Check if all required fields are filled
+        if (!ValidationsHandler.IsValidOwner(owner))
+        {
+            return new PropertyOwnerResponse
+            {
+                Status = 1, //not used in current implementation
+                Message = "The property owner was not created. All fields must be filled to create a new property owner."
+            };
+        }
+        // Check for unique VAT
+        if (db.PropertyOwners.Any(o => o.VAT == owner.VAT))
+        {
+            return new PropertyOwnerResponse
+            {
+                Status = 1, //not used in current implementation
+                Message = "The property owner was not created. A property owner with this VAT already exists."
+            };
+        }
+        // If validations pass, save the owner
         db.PropertyOwners.Add(owner);
         db.SaveChanges();
-        return owner;
+
+        return new PropertyOwnerResponse
+        {
+            Status = 0, //not used in current implementation
+            Message = $"Property owner with name {owner.FirstName} {owner.LastName} created."
+        };
     }
 
-    /*2. The display service allows displaying the following that concern the current user: (But not editable!! -GDPR-)
+    /* 2. The display service allows displaying the following that concern the current user: (But not editable!! -GDPR-)
     • Property Owner details (But not the password!! -GDPR-)
     • Property items details
     • Repairs details */
@@ -86,28 +109,64 @@ public class PropertyOwnerService
         ))
         .ToList();
     }
+    // 3. The service also includes the following options: Update, Delete.
 
-    //3. The service also includes the following options: Update, Delete.
-    public PropertyOwner? UpdatePropertyOwner(PropertyOwner owner) //can update any field if db owner id is specified
+    // Can update any field if owner id is specified
+    public PropertyOwnerResponse UpdatePropertyOwner(PropertyOwner owner) 
     {
         PropertyOwner? ownerdb = db.PropertyOwners.FirstOrDefault(c => c.Id == owner.Id);
-        if (ownerdb != null)
+        if (ownerdb == null)
         {
-            ownerdb.Email = owner.Email;
-            db.SaveChanges();
+            return new PropertyOwnerResponse
+            {
+                Status = 1,
+                Message = "Property owner not found."
+            };
         }
-        return ownerdb;
+        // Checking for unique VAT if it is changed
+        if (owner.VAT != ownerdb.VAT && db.PropertyOwners.Any(o => o.VAT == owner.VAT))
+        {
+            return new PropertyOwnerResponse
+            {
+                Status = 1,
+                Message = "Update failed. A property owner with this VAT already exists."
+            };
+        }
+
+        if (ownerdb.FirstName != owner.FirstName) ownerdb.FirstName = owner.FirstName;
+        if (ownerdb.LastName != owner.LastName) ownerdb.LastName = owner.LastName;
+        if (ownerdb.Email != owner.Email) ownerdb.Email = owner.Email;
+        if (ownerdb.Address != owner.Address) ownerdb.Address = owner.Address;
+        if (ownerdb.PhoneNumber != owner.PhoneNumber) ownerdb.PhoneNumber = owner.PhoneNumber;
+
+        db.SaveChanges();
+
+        return new PropertyOwnerResponse
+        {
+            Status = 0,
+            Message = $"Property owner with name: {ownerdb.FirstName} {ownerdb.LastName} updated successfully."
+        };
     }
 
-    public bool DeletePropertyOwner(int id) //deletes an owner based on his id
+    // Deletes an owner based on his id - Εφόσον ο Property Owner αναφέρει τα GDPR, χρησιμοποιώ μόνο hard delete
+    public PropertyOwnerResponse DeletePropertyOwner(int id)
     {
         PropertyOwner? ownerdb = db.PropertyOwners.FirstOrDefault(c => c.Id == id);
-        if (ownerdb != null)
+        if (ownerdb == null)
         {
-            db.PropertyOwners.Remove(ownerdb);
-            db.SaveChanges();
-            return true;
+            return new PropertyOwnerResponse
+            {
+                Status = 1,
+                Message = "Property owner not found."
+            };
         }
-        return false;
+
+        db.PropertyOwners.Remove(ownerdb);
+        db.SaveChanges();
+
+        return new PropertyOwnerResponse { 
+            Status = 0, 
+            Message = $"Property owner {ownerdb.FirstName} {ownerdb.LastName} was deleted successfully." 
+        };
     }
 }
