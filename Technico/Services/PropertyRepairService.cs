@@ -60,6 +60,35 @@ public class PropertyRepairService
         };
     }
 
+    public PropertyCustomResponse UpdateRepair(PropertyRepair updatedRepair)
+    {
+        // Finding requested repair and then checking if it exists
+        var repairDb = db.PropertyRepairs.FirstOrDefault(r => r.Id == updatedRepair.Id);
+
+        if (repairDb == null)
+        {
+            return new PropertyCustomResponse
+            {
+                Status = 1,
+                Message = $"Repair with id {updatedRepair.Id} was not found."
+            };
+        }
+
+        // Updating fields if validations pass - only update field when it has different value from db entry and not null
+        repairDb.ScheduledDate = updatedRepair.ScheduledDate != default ? updatedRepair.ScheduledDate : repairDb.ScheduledDate;
+        repairDb.Type = !string.IsNullOrWhiteSpace(updatedRepair.Type) ? updatedRepair.Type : repairDb.Type;
+        repairDb.RepairDescription = !string.IsNullOrWhiteSpace(updatedRepair.RepairDescription) ? updatedRepair.RepairDescription : repairDb.RepairDescription;
+        repairDb.Status = !string.IsNullOrWhiteSpace(updatedRepair.Status) ? updatedRepair.Status : repairDb.Status;
+        repairDb.Cost = updatedRepair.Cost > 0 ? updatedRepair.Cost : repairDb.Cost;
+
+        db.SaveChanges();
+
+        return new PropertyCustomResponse
+        {
+            Status = 0,
+            Message = $"Repair with id {repairDb.Id} was updated successfully."
+        };
+    }
     public PropertyCustomResponse DeleteRepair(int repairId, bool softDelete = true)
     {
         var repair = db.PropertyRepairs.FirstOrDefault(r => r.Id == repairId);
