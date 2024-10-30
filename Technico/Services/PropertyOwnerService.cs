@@ -104,13 +104,14 @@ public class PropertyOwnerService
 
     public List<ImmutableRepair> GetPropertyOwnerRepairs(int ownerId)
     {
-        return db.Repairs
-            .Where(repair => repair.PropertyOwnerId == ownerId)
-            .Select(repair => new ImmutableRepair(
+        return db.PropertyItems
+        .Where(item => item.PropertyOwners.Any(owner => owner.Id == ownerId))
+        .SelectMany(item => item.Repairs)
+        .Select(repair => new ImmutableRepair(
             repair.Id,
             repair.ScheduledDate,
             repair.Type,
-            repair.Description,
+            repair.RepairDescription,
             repair.Status,
             repair.Cost
         ))
@@ -162,8 +163,8 @@ public class PropertyOwnerService
     public PropertyCustomResponse DeletePropertyOwner(int id)
     {
         PropertyOwner? ownerdb = db.PropertyOwners
-                    .Include(o => o.Properties)
-                    .Include(o => o.Repairs)
+                    .Include(o => o.PropertyItems)
+                    .ThenInclude(pi => pi.Repairs)
                     .FirstOrDefault(o => o.Id == id);
 
         if (ownerdb == null)
@@ -175,15 +176,17 @@ public class PropertyOwnerService
             };
         }
 
-        // Soft Delete στα repairs του owner για να μην έχουμε απώλειες στο repairs history όταν διαγράφεται ο χρήστης:
-        // Πιο συγκεκριμένα, κάνουμε το PropertyOwnerId να είναι null για να εξαφανιστεί η σχέση με τον owner και να διαγραφεί εκείνος με την ησυχία του
-        foreach (var repair in ownerdb.Repairs)
+        // Soft Delete στα repairs του owner για να μην έχουμε απώλειες στο repairs history όταν διαγράφεται ο χρήστης
+        foreach (var propertyItem in ownerdb.PropertyItems)
         {
-            repair.PropertyOwnerId = null;
+            foreach (var repair in propertyItem.Repairs)
+            {
+                repair.IsDeactivated = true;
+            }
         }
 
         // Hard delete στα PropertyItems του Owner
-        foreach (var propertyItem in ownerdb.Properties)
+        foreach (var propertyItem in ownerdb.PropertyItems)
         {
             propertyItem.PropertyOwners.Remove(ownerdb); // Διαγραφή του owner από τη λίστα των co-owners
             db.PropertyItems.Remove(propertyItem); // Hard delete του ίδιου του Property Item απ τον αντίστοιχο πίνακα

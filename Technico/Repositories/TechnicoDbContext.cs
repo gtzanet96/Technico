@@ -12,7 +12,7 @@ public class TechnicoDbContext : DbContext //εδώ ορίζουμε ποια α
 {
     public DbSet<PropertyOwner> PropertyOwners { get; set; }
     public DbSet<PropertyItem> PropertyItems { get; set; }
-    public DbSet<Repair> Repairs { get; set; }
+    public DbSet<PropertyRepair> PropertyRepairs { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -33,15 +33,8 @@ public class TechnicoDbContext : DbContext //εδώ ορίζουμε ποια α
             .HasIndex(i => i.PropertyIdentificationNumber)
             .IsUnique();
 
-        // Setting PropertyOwnerId to null if the owner is deleted
-        modelBuilder.Entity<Repair>()
-        .HasOne(r => r.PropertyOwner)
-        .WithMany(po => po.Repairs)
-        .HasForeignKey(r => r.PropertyOwnerId)
-        .OnDelete(DeleteBehavior.SetNull);
-
         // Setting PropertyItemId to null if the item is deleted
-        modelBuilder.Entity<Repair>()
+        modelBuilder.Entity<PropertyRepair>()
         .HasOne(r => r.PropertyItem)
         .WithMany(pi => pi.Repairs)
         .HasForeignKey(r => r.PropertyItemId)
@@ -50,6 +43,6 @@ public class TechnicoDbContext : DbContext //εδώ ορίζουμε ποια α
         // Renaming the tables to plural
         modelBuilder.Entity<PropertyOwner>().ToTable("PropertyOwners");
         modelBuilder.Entity<PropertyItem>().ToTable("PropertyItems");
-        modelBuilder.Entity<Repair>().ToTable("Repairs");
+        modelBuilder.Entity<PropertyRepair>().ToTable("PropertyRepairs");
     }
 }

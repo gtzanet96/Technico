@@ -130,15 +130,18 @@ namespace Technico.Migrations
                         .HasPrecision(8, 2)
                         .HasColumnType("decimal(8,2)");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeactivated")
                         .HasColumnType("bit");
 
                     b.Property<int?>("PropertyItemId")
                         .HasColumnType("int");
 
-                    b.Property<string>("RepairDescription")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("PropertyOwnerId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("ScheduledDate")
                         .HasColumnType("datetime2");
@@ -155,7 +158,9 @@ namespace Technico.Migrations
 
                     b.HasIndex("PropertyItemId");
 
-                    b.ToTable("PropertyRepairs", (string)null);
+                    b.HasIndex("PropertyOwnerId");
+
+                    b.ToTable("Repairs", (string)null);
                 });
 
             modelBuilder.Entity("PropertyItemPropertyOwner", b =>
@@ -180,12 +185,21 @@ namespace Technico.Migrations
                         .HasForeignKey("PropertyItemId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("Technico.Models.PropertyOwner", null)
+                        .WithMany("PropertyRepairs")
+                        .HasForeignKey("PropertyOwnerId");
+
                     b.Navigation("PropertyItem");
                 });
 
             modelBuilder.Entity("Technico.Models.PropertyItem", b =>
                 {
                     b.Navigation("Repairs");
+                });
+
+            modelBuilder.Entity("Technico.Models.PropertyOwner", b =>
+                {
+                    b.Navigation("PropertyRepairs");
                 });
 #pragma warning restore 612, 618
         }

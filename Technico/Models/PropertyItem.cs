@@ -16,5 +16,5 @@ public class PropertyItem
     public bool IsDeactivated { get; set; } = false; // default to active
 
     public List<PropertyOwner> PropertyOwners { get; set; } = []; //ένα property item μπορεί να έχει πολλούς property owners
-    public List<Repair> Repairs { get; set; } = []; //ένα property item μπορεί να έχει πολλά repairs
+    public List<PropertyRepair> Repairs { get; set; } = []; //ένα property item μπορεί να έχει πολλά repairs
 }

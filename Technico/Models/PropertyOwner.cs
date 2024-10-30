@@ -20,6 +20,6 @@ public class PropertyOwner
     public string Password { get; set; } = string.Empty;
     public string UserType { get; set; } = "Primary Owner"; // Default user type
 
-    public List<PropertyItem> Properties { get; set; } = [];
-    public List<Repair> Repairs { get; set; } = [];
+    public List<PropertyItem> PropertyItems { get; set; } = [];
+    //public List<PropertyRepair> PropertyRepairs { get; set; } = [];
 }

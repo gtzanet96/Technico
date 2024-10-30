@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Technico.Repositories;
 
@@ -11,9 +12,11 @@ using Technico.Repositories;
 namespace Technico.Migrations
 {
     [DbContext(typeof(TechnicoDbContext))]
-    partial class TechnicoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241030214648_Remove_property_owner_id_from_repairs_table")]
+    partial class Remove_property_owner_id_from_repairs_table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,13 +27,13 @@ namespace Technico.Migrations
 
             modelBuilder.Entity("PropertyItemPropertyOwner", b =>
                 {
-                    b.Property<int>("PropertyItemsId")
+                    b.Property<int>("PropertiesId")
                         .HasColumnType("int");
 
                     b.Property<int>("PropertyOwnersId")
                         .HasColumnType("int");
 
-                    b.HasKey("PropertyItemsId", "PropertyOwnersId");
+                    b.HasKey("PropertiesId", "PropertyOwnersId");
 
                     b.HasIndex("PropertyOwnersId");
 
@@ -130,15 +133,18 @@ namespace Technico.Migrations
                         .HasPrecision(8, 2)
                         .HasColumnType("decimal(8,2)");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeactivated")
                         .HasColumnType("bit");
 
                     b.Property<int?>("PropertyItemId")
                         .HasColumnType("int");
 
-                    b.Property<string>("RepairDescription")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("PropertyOwnerId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("ScheduledDate")
                         .HasColumnType("datetime2");
@@ -155,14 +161,16 @@ namespace Technico.Migrations
 
                     b.HasIndex("PropertyItemId");
 
-                    b.ToTable("PropertyRepairs", (string)null);
+                    b.HasIndex("PropertyOwnerId");
+
+                    b.ToTable("Repairs", (string)null);
                 });
 
             modelBuilder.Entity("PropertyItemPropertyOwner", b =>
                 {
                     b.HasOne("Technico.Models.PropertyItem", null)
                         .WithMany()
-                        .HasForeignKey("PropertyItemsId")
+                        .HasForeignKey("PropertiesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -180,10 +188,21 @@ namespace Technico.Migrations
                         .HasForeignKey("PropertyItemId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("Technico.Models.PropertyOwner", "PropertyOwner")
+                        .WithMany("Repairs")
+                        .HasForeignKey("PropertyOwnerId");
+
                     b.Navigation("PropertyItem");
+
+                    b.Navigation("PropertyOwner");
                 });
 
             modelBuilder.Entity("Technico.Models.PropertyItem", b =>
+                {
+                    b.Navigation("Repairs");
+                });
+
+            modelBuilder.Entity("Technico.Models.PropertyOwner", b =>
                 {
                     b.Navigation("Repairs");
                 });

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Technico.Repositories;
 
@@ -11,9 +12,11 @@ using Technico.Repositories;
 namespace Technico.Migrations
 {
     [DbContext(typeof(TechnicoDbContext))]
-    partial class TechnicoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241030224001_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,6 +139,9 @@ namespace Technico.Migrations
                     b.Property<int?>("PropertyItemId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PropertyOwnerId")
+                        .HasColumnType("int");
+
                     b.Property<string>("RepairDescription")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -154,6 +160,8 @@ namespace Technico.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("PropertyItemId");
+
+                    b.HasIndex("PropertyOwnerId");
 
                     b.ToTable("PropertyRepairs", (string)null);
                 });
@@ -180,12 +188,21 @@ namespace Technico.Migrations
                         .HasForeignKey("PropertyItemId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("Technico.Models.PropertyOwner", null)
+                        .WithMany("PropertyRepairs")
+                        .HasForeignKey("PropertyOwnerId");
+
                     b.Navigation("PropertyItem");
                 });
 
             modelBuilder.Entity("Technico.Models.PropertyItem", b =>
                 {
                     b.Navigation("Repairs");
+                });
+
+            modelBuilder.Entity("Technico.Models.PropertyOwner", b =>
+                {
+                    b.Navigation("PropertyRepairs");
                 });
 #pragma warning restore 612, 618
         }

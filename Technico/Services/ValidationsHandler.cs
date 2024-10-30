@@ -30,6 +30,17 @@ public static class ValidationsHandler
             return false;
         return true;
     }
+
+    public static bool isValidRepair(PropertyRepair repair)
+    {
+        if (repair.ScheduledDate == default ||
+            string.IsNullOrWhiteSpace(repair.Type) ||
+            string.IsNullOrWhiteSpace(repair.RepairDescription) ||
+            string.IsNullOrWhiteSpace(repair.Status) ||
+            repair.Cost <= 0)
+            return false;
+        return true;
+    }
 }
 
 
