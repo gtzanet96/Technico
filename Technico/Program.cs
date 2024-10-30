@@ -64,7 +64,8 @@ var item1 = new PropertyItem()
 //PropertyCustomResponse response = itemService.CreatePropertyItem(item1, "1221442");
 //PropertyCustomResponse response = itemService.UpdatePropertyItem(item1);
 //PropertyCustomResponse response = itemService.AddCoOwnerToPropertyItem(2, "12335456");
-PropertyCustomResponse response = itemService.RemoveCoOwnerFromPropertyItem(2, "12335456");
+//PropertyCustomResponse response = itemService.RemoveCoOwnerFromPropertyItem(2, "12335456");
+PropertyCustomResponse response = itemService.DeletePropertyItem(1, false);
 Console.WriteLine(response.Message);
 
 //var item = itemService.GetPropertyItemDetails(1);

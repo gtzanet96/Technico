@@ -20,7 +20,7 @@ public class PropertyItemService
     // 2. Create
     public PropertyCustomResponse CreatePropertyItem(PropertyItem item, string ownerVat)
     {
-        // Check if there is a PropertyOwner with this VAT
+        // Check if the provided VAT is valid (exists in db owners)
         var owner = db.PropertyOwners.FirstOrDefault(o => o.VAT == ownerVat);
         if (owner == null)
         {
@@ -37,16 +37,16 @@ public class PropertyItemService
         {
             return new PropertyCustomResponse
             {
-                Status = 1, //not used in current implementation
+                Status = 1,
                 Message = "The property owner was not created. All fields must be filled to create a new property owner."
             };
         }
-        // Check for unique E9
+        // Check for unique PropertyIdentificationNumber(E9)
         if (db.PropertyItems.Any(i => i.PropertyIdentificationNumber == item.PropertyIdentificationNumber))
         {
             return new PropertyCustomResponse
             {
-                Status = 1, //not used in current implementation
+                Status = 1,
                 Message = "The property item was not created. A property item with this PropertyIdentificationNumber already exists."
             };
         }
@@ -76,7 +76,7 @@ public class PropertyItemService
                     owner.VAT,
                     owner.FirstName,
                     owner.LastName
-                )).ToList() // List of full-detail ImmutablePropertyOwner
+                )).ToList() // λίστα των βασικών στοιχείων των co-owners
             ))
             .FirstOrDefault();
         return propertyItem;
@@ -186,5 +186,58 @@ public class PropertyItemService
             Status = 0,
             Message = $"Owner {owner.FirstName} {owner.LastName} was removed from co-owners of the property with number {item.PropertyIdentificationNumber}."
         };
+    }
+
+    public PropertyCustomResponse DeletePropertyItem(int itemId, bool softDelete = true) // Set softDelete to false for Hard delete
+    {
+        // Get property item and related PropertyOwners and Repairs
+        var propertyItem = db.PropertyItems
+            .Include(pi => pi.PropertyOwners)
+            .Include(pi => pi.Repairs)
+            .FirstOrDefault(pi => pi.Id == itemId);
+
+        Console.WriteLine(propertyItem);
+
+        if (propertyItem == null)
+        {
+            return new PropertyCustomResponse
+            {
+                Status = 1,
+                Message = "Property item was not found."
+            };
+        }
+
+        if (softDelete)
+        {
+            propertyItem.IsDeactivated = true;
+            db.SaveChanges();
+
+            return new PropertyCustomResponse
+            {
+                Status = 0,
+                Message = $"Property item with Property Identification Number {propertyItem.PropertyIdentificationNumber} was deactivated."
+            };
+        }
+        else
+        {
+            // First delete associations with PropertyOwners in the join table
+            propertyItem.PropertyOwners.Clear();
+
+            // Then delete repairs related to the property item
+            foreach (var repair in propertyItem.Repairs.ToList())
+            {
+                db.Repairs.Remove(repair);
+            }
+
+            // Finally, hard delete the property item itself with no further implications
+            db.PropertyItems.Remove(propertyItem);
+            db.SaveChanges();
+
+            return new PropertyCustomResponse
+            {
+                Status = 0,
+                Message = $"Property item with ID {propertyItem.PropertyIdentificationNumber} was permanently deleted."
+            };
+        }
     }
 }
