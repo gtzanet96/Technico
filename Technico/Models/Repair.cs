@@ -19,6 +19,6 @@ public class Repair
     public int? PropertyOwnerId { get; set; } // αντί για το owner vat ώστε σε πιθανή μελλοντική αλλαγή να μην αλλάζει σε δύο μέρη
     public PropertyOwner? PropertyOwner { get; set; } // navigation property, δεν θα εμφανιστεί σαν ξεχωριστή στήλη
 
-    public int PropertyItemId { get; set; } // αντί για το property address που ανέφερε το business στο repair entity, για λόγους ίδιους με τους παραπάνω
+    public int? PropertyItemId { get; set; } // αντί για το property address που ανέφερε το business στο repair entity, για λόγους ίδιους με τους παραπάνω
     public PropertyItem? PropertyItem { get; set; } // navigation property, δεν θα εμφανιστεί σαν ξεχωριστή στήλη
 }

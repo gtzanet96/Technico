@@ -196,8 +196,6 @@ public class PropertyItemService
             .Include(pi => pi.Repairs)
             .FirstOrDefault(pi => pi.Id == itemId);
 
-        Console.WriteLine(propertyItem);
-
         if (propertyItem == null)
         {
             return new PropertyCustomResponse
@@ -226,7 +224,7 @@ public class PropertyItemService
             // Then delete repairs related to the property item
             foreach (var repair in propertyItem.Repairs.ToList())
             {
-                db.Repairs.Remove(repair);
+                repair.PropertyItemId = null;
             }
 
             // Finally, hard delete the property item itself with no further implications

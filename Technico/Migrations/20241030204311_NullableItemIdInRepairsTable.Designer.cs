@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Technico.Repositories;
 
@@ -11,9 +12,11 @@ using Technico.Repositories;
 namespace Technico.Migrations
 {
     [DbContext(typeof(TechnicoDbContext))]
-    partial class TechnicoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241030204311_NullableItemIdInRepairsTable")]
+    partial class NullableItemIdInRepairsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -179,8 +182,7 @@ namespace Technico.Migrations
                 {
                     b.HasOne("Technico.Models.PropertyItem", "PropertyItem")
                         .WithMany("Repairs")
-                        .HasForeignKey("PropertyItemId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("PropertyItemId");
 
                     b.HasOne("Technico.Models.PropertyOwner", "PropertyOwner")
                         .WithMany("Repairs")

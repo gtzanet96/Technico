@@ -38,7 +38,14 @@ public class TechnicoDbContext : DbContext //εδώ ορίζουμε ποια α
         .HasOne(r => r.PropertyOwner)
         .WithMany(po => po.Repairs)
         .HasForeignKey(r => r.PropertyOwnerId)
-        .OnDelete(DeleteBehavior.SetNull); 
+        .OnDelete(DeleteBehavior.SetNull);
+
+        // Setting PropertyItemId to null if the item is deleted
+        modelBuilder.Entity<Repair>()
+        .HasOne(r => r.PropertyItem)
+        .WithMany(pi => pi.Repairs)
+        .HasForeignKey(r => r.PropertyItemId)
+        .OnDelete(DeleteBehavior.SetNull);
 
         // Renaming the tables to plural
         modelBuilder.Entity<PropertyOwner>().ToTable("PropertyOwners");
