@@ -22,6 +22,7 @@ public class TechnicoDbContext : DbContext //εδώ ορίζουμε ποια α
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Adding Unique constraints to vat and e9
         modelBuilder
             .Entity<PropertyOwner>()
             .HasIndex(o => o.VAT)
@@ -32,6 +33,14 @@ public class TechnicoDbContext : DbContext //εδώ ορίζουμε ποια α
             .HasIndex(i => i.PropertyIdentificationNumber)
             .IsUnique();
 
+        // Setting PropertyOwnerId to null if the owner is deleted
+        modelBuilder.Entity<Repair>()
+        .HasOne(r => r.PropertyOwner)
+        .WithMany(po => po.Repairs)
+        .HasForeignKey(r => r.PropertyOwnerId)
+        .OnDelete(DeleteBehavior.SetNull); 
+
+        // Renaming the tables to plural
         modelBuilder.Entity<PropertyOwner>().ToTable("PropertyOwners");
         modelBuilder.Entity<PropertyItem>().ToTable("PropertyItems");
         modelBuilder.Entity<Repair>().ToTable("Repairs");

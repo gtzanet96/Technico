@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +29,7 @@ public class PropertyOwnerService
         this.db = db;
     }
 
-    // 1. The self-registration service
+    // 1. The property owner self-registration service
     public PropertyCustomResponse CreatePropertyOwner(PropertyOwner owner)
     {
         // Check if all required fields are filled
@@ -36,7 +37,7 @@ public class PropertyOwnerService
         {
             return new PropertyCustomResponse
             {
-                Status = 1, //not used in current implementation
+                Status = 1, //Status is not used in current implementation, it is here just for good practice
                 Message = "The property owner was not created. All fields must be filled to create a new property owner."
             };
         }
@@ -45,7 +46,7 @@ public class PropertyOwnerService
         {
             return new PropertyCustomResponse
             {
-                Status = 1, //not used in current implementation
+                Status = 1,
                 Message = "The property owner was not created. A property owner with this VAT already exists."
             };
         }
@@ -55,7 +56,7 @@ public class PropertyOwnerService
 
         return new PropertyCustomResponse
         {
-            Status = 0, //not used in current implementation
+            Status = 0,
             Message = $"Property owner with name {owner.FirstName} {owner.LastName} created."
         };
     }
@@ -115,8 +116,8 @@ public class PropertyOwnerService
         ))
         .ToList();
     }
-    // 3. The service also includes the following options: Update, Delete.
 
+    // 3. The service also includes the following options: Update, Delete.
     // Can update any field if owner id is specified
     public PropertyCustomResponse UpdatePropertyOwner(PropertyOwner owner) 
     {
@@ -160,22 +161,40 @@ public class PropertyOwnerService
     // Deletes an owner based on his id - Εφόσον ο Property Owner αναφέρει τα GDPR, χρησιμοποιώ μόνο hard delete
     public PropertyCustomResponse DeletePropertyOwner(int id)
     {
-        PropertyOwner? ownerdb = db.PropertyOwners.FirstOrDefault(c => c.Id == id);
+        PropertyOwner? ownerdb = db.PropertyOwners
+                    .Include(o => o.Properties)
+                    .Include(o => o.Repairs)
+                    .FirstOrDefault(o => o.Id == id);
+
         if (ownerdb == null)
         {
             return new PropertyCustomResponse
             {
                 Status = 1,
-                Message = "Property owner not found."
+                Message = "Property owner was not found."
             };
         }
 
-        db.PropertyOwners.Remove(ownerdb);
+        // Soft Delete στα repairs του owner για να μην έχουμε απώλειες στο repairs history όταν διαγράφεται ο χρήστης:
+        // Πιο συγκεκριμένα, κάνουμε το PropertyOwnerId να είναι null για να εξαφανιστεί η σχέση με τον owner και να διαγραφεί εκείνος με την ησυχία του
+        foreach (var repair in ownerdb.Repairs)
+        {
+            repair.PropertyOwnerId = null;
+        }
+
+        // Hard delete στα PropertyItems του Owner
+        foreach (var propertyItem in ownerdb.Properties)
+        {
+            propertyItem.PropertyOwners.Remove(ownerdb); // Διαγραφή του owner από τη λίστα των co-owners
+            db.PropertyItems.Remove(propertyItem); // Hard delete του ίδιου του Property Item απ τον αντίστοιχο πίνακα
+        }
+
+        db.PropertyOwners.Remove(ownerdb); // Hard delete τον PropertyOwner
         db.SaveChanges();
 
         return new PropertyCustomResponse { 
-            Status = 0, 
-            Message = $"Property owner {ownerdb.FirstName} {ownerdb.LastName} was deleted successfully." 
+            Status = 0,
+            Message = $"Property owner {ownerdb.FirstName} {ownerdb.LastName} and his associated property items were deleted successfully."
         };
     }
 }

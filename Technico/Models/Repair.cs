@@ -16,7 +16,7 @@ public class Repair
     public string Status { get; set; } = "Pending"; // status: (Pending, In Progress, Complete)
     [Precision(8, 2)] public decimal Cost { get; set; }
 
-    public int PropertyOwnerId { get; set; } // αντί για το owner vat ώστε σε πιθανή μελλοντική αλλαγή να μην αλλάζει σε δύο μέρη
+    public int? PropertyOwnerId { get; set; } // αντί για το owner vat ώστε σε πιθανή μελλοντική αλλαγή να μην αλλάζει σε δύο μέρη
     public PropertyOwner? PropertyOwner { get; set; } // navigation property, δεν θα εμφανιστεί σαν ξεχωριστή στήλη
 
     public int PropertyItemId { get; set; } // αντί για το property address που ανέφερε το business στο repair entity, για λόγους ίδιους με τους παραπάνω
