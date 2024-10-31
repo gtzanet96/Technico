@@ -7,24 +7,21 @@ using Technico.Services;
 
 Console.WriteLine("Hello, Mr. Iracleous!");
 
+TechnicoDbContext db = new TechnicoDbContext();
+
+/* για τον Owner: */
 var owner1 = new PropertyOwner()
 {
     FirstName = "Albert",
-    LastName = "C",
+    LastName = "Ca",
     PhoneNumber = "210232367890",
-    VAT = "777",
+    VAT = "1777",
     Address = "L K 17-19",
-    Email = "stranger@gmail.com",
+    Email = "astranger@gmail.com",
     Password = "Password123"
 };
-//τα παραπάνω είναι στη RAM. Για να τα σώσω δουλεύω στη βάση.
 
-TechnicoDbContext db = new TechnicoDbContext();
 PropertyOwnerService ownerService = new PropertyOwnerService(db);
-
-
-
-/* για τον Owner: */
 
 // ***** Create-Update-Delete Owner *****
 //Σημείωση: Σε περίπτωση που αφήσετε και κενό κάποιο πεδίο και ίδιο το vat με κάποιο προηγούμενο vat, το vat error χτυπάει πριν από το null field error,
