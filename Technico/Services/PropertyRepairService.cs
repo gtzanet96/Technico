@@ -10,7 +10,7 @@ using Technico.Responses;
 
 namespace Technico.Services;
 
-public class PropertyRepairService
+public class PropertyRepairService : IPropertyRepairService
 {
     private readonly TechnicoDbContext db;
 

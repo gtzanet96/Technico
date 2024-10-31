@@ -11,7 +11,7 @@ using Technico.Responses;
 
 namespace Technico.Services;
 
-public class PropertyOwnerService
+public class PropertyOwnerService : IPropertyOwnerService
 {
     /* GDPR requirements are met in the following ways:
      - Data Minimization: Συλλέγουμε και επεξεργαζόμαστε μόνο τα απαραίτητα για την υπηρεσία δεδομένων.
@@ -42,7 +42,7 @@ public class PropertyOwnerService
         if (db.PropertyOwners.Any(o => o.Email == owner.Email))
             return new PropertyCustomResponse { Status = 1, Message = "Owner creation failed. A property owner with this Email address already exists." };
         // Check for valid email format
-        if (!ValidationsHandler.IsValidEmail(owner.Email)) 
+        if (!ValidationsHandler.IsValidEmail(owner.Email))
             return new PropertyCustomResponse { Status = 1, Message = "Owner creation failed. Email format is invalid." };
         // If validations pass, save the owner
         try
@@ -115,7 +115,7 @@ public class PropertyOwnerService
     }
 
     // 3. The service also includes the following options: Update, Delete.
-    public PropertyCustomResponse UpdatePropertyOwner(int ownerId, PropertyOwner updatedOwner) 
+    public PropertyCustomResponse UpdatePropertyOwner(int ownerId, PropertyOwner updatedOwner)
     {
         PropertyOwner? ownerdb = db.PropertyOwners.FirstOrDefault(o => o.Id == ownerId);
         if (ownerdb == null)

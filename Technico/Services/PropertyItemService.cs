@@ -10,7 +10,7 @@ using Technico.Responses;
 
 namespace Technico.Services;
 
-public class PropertyItemService
+public class PropertyItemService : IPropertyItemService
 {
     private TechnicoDbContext db;
     public PropertyItemService(TechnicoDbContext db) // dependency injection
@@ -24,14 +24,14 @@ public class PropertyItemService
         var owner = db.PropertyOwners.FirstOrDefault(o => o.VAT == ownerVat);
         if (owner == null)
             return new PropertyCustomResponse { Status = 1, Message = "Property item creation failed. No property owner found with the provided VAT." };
-        
+
         // Add owner to co-owners list of the property item
         item.PropertyOwners.Add(owner);
-        
+
         // Check for empty fields - we want everything filled
         if (!ValidationsHandler.isValidItem(item))
             return new PropertyCustomResponse { Status = 1, Message = "The property owner was not created. All fields must be filled to create a new property owner." };
-        
+
         // Check for unique PropertyIdentificationNumber(E9)
         if (db.PropertyItems.Any(i => i.PropertyIdentificationNumber == item.PropertyIdentificationNumber))
             return new PropertyCustomResponse { Status = 1, Message = "The property item was not created. A property item with this PropertyIdentificationNumber already exists." };
@@ -47,7 +47,7 @@ public class PropertyItemService
         {
             return new PropertyCustomResponse { Status = 1, Message = $"Property item creation with with PropertyIdentificationNumber {item.PropertyIdentificationNumber} failed due to a database error: '{e.Message}'" };
         }
-   }
+    }
 
     // 1. Display all the details of the property
     public ImmutablePropertyItem? GetPropertyItemDetails(int itemId)
@@ -142,7 +142,7 @@ public class PropertyItemService
         item.PropertyOwners.Remove(owner);
         db.SaveChanges();
 
-        return new PropertyCustomResponse { Status = 0,  Message = $"Owner {owner.FirstName} {owner.LastName} was removed from co-owners of the property with number {item.PropertyIdentificationNumber}." };
+        return new PropertyCustomResponse { Status = 0, Message = $"Owner {owner.FirstName} {owner.LastName} was removed from co-owners of the property with number {item.PropertyIdentificationNumber}." };
     }
 
     public PropertyCustomResponse DeletePropertyItem(int itemId, bool softDelete = true) // Set softDelete to false for Hard delete
