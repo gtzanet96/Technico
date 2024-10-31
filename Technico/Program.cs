@@ -115,13 +115,11 @@ PropertyItem[] items = new PropertyItem[]
     new PropertyItem { PropertyIdentificationNumber = 1209887727, PropertyAddress = "Nj O 15", YearOfConstruction = 2010, PropertyType = PropertyType.ApartmentBuilding }
 };
 // ***** Create-Update-Add & Remove Coowner-Delete ***** 
-
-// ***** Create-Update-Add & Remove Coowner-Delete ***** 
-foreach (var item in items)
-{
-    PropertyCustomResponse response = itemService.CreatePropertyItem(item, "22222"); //parameters: (new item, owner vat) - δημιουργεί 5 property items για τον ίδιο owner!
-    Console.WriteLine(response.Message);
-}
+//foreach (var item in items)
+//{
+//    PropertyCustomResponse response = itemService.CreatePropertyItem(item, "22222"); //parameters: (new item, owner vat) - δημιουργεί 5 property items για τον ίδιο owner!
+//    Console.WriteLine(response.Message);
+//}
 //PropertyCustomResponse response = itemService.CreatePropertyItem(item1, "22222"); //parameters: (new item, owner vat) - δημιουργεί 1 property item για 1 owner
 //PropertyCustomResponse response = itemService.UpdatePropertyItem(3, item1); //parameters: (item id, new item)
 //PropertyCustomResponse response = itemService.AddCoOwnerToPropertyItem(1, "777"); //parameters: (property id, owner vat)
@@ -159,11 +157,11 @@ PropertyRepair[] repairs = new PropertyRepair[]
     new PropertyRepair { ScheduledDate = new DateTime(2025, 8, 1, 8, 15, 00), RepairType = RepairType.Frames, RepairDescription = "window frames", Cost = 18M, RepairStatus = RepairStatus.InProgress }
 };
 // ***** Create-Update-Delete *****
-foreach (var repair in repairs)
-{
-    PropertyCustomResponse response = repairService.CreateRepair(repair, 1); //parameters: (new repair, property item id) - δημιουργεί 5 repairs για το ίδιο property item!
-    Console.WriteLine(response.Message);
-}
+//foreach (var repair in repairs)
+//{
+//    PropertyCustomResponse response = repairService.CreateRepair(repair, 1); //parameters: (new repair, property item id) - δημιουργεί 5 repairs για το ίδιο property item!
+//    Console.WriteLine(response.Message);
+//}
 //PropertyCustomResponse response = repairService.CreateRepair(repair1, 4); //parameters: (new repair, property item id) - δημιουργεί 1 repair για 1 property item!
 //PropertyCustomResponse response = repairService.UpdateRepair(1, repair1); //parameters: (repair id, new repair)
 //PropertyCustomResponse response = repairService.DeleteRepair(2, false); //parameters: (repair id, false=hard delete και true=soft delete)
