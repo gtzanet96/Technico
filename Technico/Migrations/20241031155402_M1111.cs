@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Technico.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class M1111 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,7 +17,7 @@ namespace Technico.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PropertyIdentificationNumber = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PropertyIdentificationNumber = table.Column<long>(type: "bigint", nullable: false),
                     PropertyAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     YearOfConstruction = table.Column<int>(type: "int", nullable: false),
                     PropertyType = table.Column<int>(type: "int", nullable: false),
@@ -49,6 +49,31 @@ namespace Technico.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PropertyRepairs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ScheduledDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RepairDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Cost = table.Column<decimal>(type: "decimal(8,2)", precision: 8, scale: 2, nullable: false),
+                    IsDeactivated = table.Column<bool>(type: "bit", nullable: false),
+                    PropertyItemId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PropertyRepairs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PropertyRepairs_PropertyItems_PropertyItemId",
+                        column: x => x.PropertyItemId,
+                        principalTable: "PropertyItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PropertyItemPropertyOwner",
                 columns: table => new
                 {
@@ -72,37 +97,6 @@ namespace Technico.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "PropertyRepairs",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ScheduledDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RepairDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Cost = table.Column<decimal>(type: "decimal(8,2)", precision: 8, scale: 2, nullable: false),
-                    IsDeactivated = table.Column<bool>(type: "bit", nullable: false),
-                    PropertyItemId = table.Column<int>(type: "int", nullable: true),
-                    PropertyOwnerId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PropertyRepairs", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PropertyRepairs_PropertyItems_PropertyItemId",
-                        column: x => x.PropertyItemId,
-                        principalTable: "PropertyItems",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "FK_PropertyRepairs_PropertyOwners_PropertyOwnerId",
-                        column: x => x.PropertyOwnerId,
-                        principalTable: "PropertyOwners",
-                        principalColumn: "Id");
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_PropertyItemPropertyOwner_PropertyOwnersId",
                 table: "PropertyItemPropertyOwner",
@@ -124,11 +118,6 @@ namespace Technico.Migrations
                 name: "IX_PropertyRepairs_PropertyItemId",
                 table: "PropertyRepairs",
                 column: "PropertyItemId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PropertyRepairs_PropertyOwnerId",
-                table: "PropertyRepairs",
-                column: "PropertyOwnerId");
         }
 
         /// <inheritdoc />
@@ -141,10 +130,10 @@ namespace Technico.Migrations
                 name: "PropertyRepairs");
 
             migrationBuilder.DropTable(
-                name: "PropertyItems");
+                name: "PropertyOwners");
 
             migrationBuilder.DropTable(
-                name: "PropertyOwners");
+                name: "PropertyItems");
         }
     }
 }

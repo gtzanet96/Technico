@@ -11,9 +11,9 @@ public class PropertyRepair
 {
     public int Id { get; set; } // PK
     public DateTime ScheduledDate { get; set; }
-    public string Type { get; set; } = string.Empty; // type of repair: (Painting, Insulation, Frames, plumbing, electrical work)
+    public RepairType RepairType { get; set; } // type of repair: (Painting, Insulation, Frames, plumbing, electrical work) - default: Uncategorized
     public string RepairDescription { get; set; } = string.Empty;
-    public string Status { get; set; } = "Pending"; // status: (Pending, In Progress, Complete)
+    public RepairStatus RepairStatus { get; set; } = RepairStatus.Pending; // status: (Pending, In Progress, Complete) - default: Pending
     [Precision(8, 2)] public decimal Cost { get; set; }
     public bool IsDeactivated { get; set; } = false; // default to active
 

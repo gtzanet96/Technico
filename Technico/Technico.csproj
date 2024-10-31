@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <Folder Include="Business Exceptions\" />
-    <Folder Include="Migrations_Old\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -9,7 +9,7 @@ namespace Technico.Responses;
 
 public record ImmutablePropertyItem(
     int Id,
-    string PropertyIdentificationNumber,
+    long PropertyIdentificationNumber,
     string PropertyAddress,
     int YearOfConstruction,
     PropertyType PropertyType,

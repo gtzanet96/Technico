@@ -9,7 +9,7 @@ namespace Technico.Models;
 public class PropertyItem
 {
     public int Id { get; set; }  // PK
-    public string PropertyIdentificationNumber { get; set; } = string.Empty; // MUST BE UNIQUE
+    public long PropertyIdentificationNumber { get; set; } // MUST BE UNIQUE
     public string PropertyAddress { get; set; } = string.Empty;
     public int YearOfConstruction { get; set; }
     public PropertyType PropertyType { get; set; } // default to Uncategorized

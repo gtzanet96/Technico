@@ -52,9 +52,8 @@ namespace Technico.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PropertyIdentificationNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<long>("PropertyIdentificationNumber")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("PropertyType")
                         .HasColumnType("int");
@@ -140,16 +139,14 @@ namespace Technico.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("RepairStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RepairType")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("ScheduledDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Technico.Models;
 
@@ -22,9 +23,16 @@ public static class ValidationsHandler
         return true;
     }
 
+    public static bool IsValidEmail(string email)
+    {
+        // Regular expression for validating email format
+        string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+        return Regex.IsMatch(email, emailPattern);
+    }
+
     public static bool isValidItem(PropertyItem item)
     {
-        if (string.IsNullOrWhiteSpace(item.PropertyIdentificationNumber) ||
+        if (item.PropertyIdentificationNumber <= 0 ||
             string.IsNullOrWhiteSpace(item.PropertyAddress) ||
             item.YearOfConstruction <= 0)
             return false;
@@ -34,13 +42,13 @@ public static class ValidationsHandler
     public static bool isValidRepair(PropertyRepair repair)
     {
         if (repair.ScheduledDate == default ||
-            string.IsNullOrWhiteSpace(repair.Type) ||
+            repair.RepairType == RepairType.Uncategorized ||
             string.IsNullOrWhiteSpace(repair.RepairDescription) ||
-            string.IsNullOrWhiteSpace(repair.Status) ||
             repair.Cost <= 0)
             return false;
         return true;
     }
+
 }
 
 

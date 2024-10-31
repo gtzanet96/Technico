@@ -34,41 +34,37 @@ public class PropertyOwnerService
     {
         // Check if all required fields are filled
         if (!ValidationsHandler.IsValidOwner(owner))
-        {
-            return new PropertyCustomResponse
-            {
-                Status = 1, //Status is not used in current implementation, it is here just for good practice
-                Message = "The property owner was not created. All fields must be filled to create a new property owner."
-            };
-        }
+            return new PropertyCustomResponse { Status = 1, Message = "Owner creation failed. All fields must be filled to create a new property owner." };
         // Check for unique VAT
         if (db.PropertyOwners.Any(o => o.VAT == owner.VAT))
-        {
-            return new PropertyCustomResponse
-            {
-                Status = 1,
-                Message = "The property owner was not created. A property owner with this VAT already exists."
-            };
-        }
+            return new PropertyCustomResponse { Status = 1, Message = "Owner creation failed. A property owner with this VAT already exists." };
+        // Check for unique email
+        if (db.PropertyOwners.Any(o => o.Email == owner.Email))
+            return new PropertyCustomResponse { Status = 1, Message = "Owner creation failed. A property owner with this Email address already exists." };
+        // Check for valid email format
+        if (!ValidationsHandler.IsValidEmail(owner.Email)) 
+            return new PropertyCustomResponse { Status = 1, Message = "Owner creation failed. Email format is invalid." };
         // If validations pass, save the owner
-        db.PropertyOwners.Add(owner);
-        db.SaveChanges();
-
-        return new PropertyCustomResponse
+        try
         {
-            Status = 0,
-            Message = $"Property owner with name {owner.FirstName} {owner.LastName} created."
-        };
+            db.PropertyOwners.Add(owner);
+            db.SaveChanges();
+            return new PropertyCustomResponse { Status = 0, Message = $"Property owner with name {owner.FirstName} {owner.LastName} was created." };
+        }
+        catch (Exception e)
+        {
+            return new PropertyCustomResponse { Status = 1, Message = $"Owner creation failed due to a database error: '{e.Message}'" };
+        }
     }
 
     /* 2. The display service allows displaying the following that concern the current user: (But not editable!! -GDPR-)
     • Property Owner details (But not the password!! -GDPR-)
     • Property items details
     • Repairs details */
-    public ImmutablePropertyOwner? GetPropertyOwnerDetails(int id)
+    public ImmutablePropertyOwner? GetPropertyOwnerDetails(int ownerId)
     {
         return db.PropertyOwners
-            .Where(owner => owner.Id == id)
+            .Where(owner => owner.Id == ownerId)
             .Select(owner => new ImmutablePropertyOwner(
                 owner.Id,
                 owner.VAT,
@@ -110,56 +106,50 @@ public class PropertyOwnerService
         .Select(repair => new ImmutableRepair(
             repair.Id,
             repair.ScheduledDate,
-            repair.Type,
+            repair.RepairType,
             repair.RepairDescription,
-            repair.Status,
+            repair.RepairStatus,
             repair.Cost
         ))
         .ToList();
     }
 
     // 3. The service also includes the following options: Update, Delete.
-    // Can update any field if owner id is specified
-    public PropertyCustomResponse UpdatePropertyOwner(PropertyOwner owner) 
+    public PropertyCustomResponse UpdatePropertyOwner(int ownerId, PropertyOwner updatedOwner) 
     {
-        PropertyOwner? ownerdb = db.PropertyOwners.FirstOrDefault(c => c.Id == owner.Id);
+        PropertyOwner? ownerdb = db.PropertyOwners.FirstOrDefault(o => o.Id == ownerId);
         if (ownerdb == null)
+            return new PropertyCustomResponse { Status = 1, Message = "Property owner not found." };
+        // Check for unique VAT if VAT is to be updated
+        if (updatedOwner.VAT != ownerdb.VAT && db.PropertyOwners.Any(o => o.VAT == updatedOwner.VAT))
+            return new PropertyCustomResponse { Status = 1, Message = "Update failed. A property owner with this VAT already exists." };
+        // Check for unique email
+        if (db.PropertyOwners.Any(o => o.Email == updatedOwner.Email))
+            return new PropertyCustomResponse { Status = 1, Message = "Owner creation failed. A property owner with this Email address already exists." };
+        // Check for valid email format
+        if (!ValidationsHandler.IsValidEmail(updatedOwner.Email))
+            return new PropertyCustomResponse { Status = 1, Message = "Owner creation failed. Email format is invalid." };
+
+        // Only update a field when it has different value from db entry and is not null
+        ownerdb.VAT = (ownerdb.VAT != updatedOwner.VAT && !string.IsNullOrWhiteSpace(updatedOwner.VAT)) ? updatedOwner.VAT : ownerdb.VAT;
+        ownerdb.FirstName = (ownerdb.FirstName != updatedOwner.FirstName && !string.IsNullOrWhiteSpace(updatedOwner.FirstName)) ? updatedOwner.FirstName : ownerdb.FirstName;
+        ownerdb.LastName = (ownerdb.LastName != updatedOwner.LastName && !string.IsNullOrWhiteSpace(updatedOwner.LastName)) ? updatedOwner.LastName : ownerdb.LastName;
+        ownerdb.Email = (ownerdb.Email != updatedOwner.Email && !string.IsNullOrWhiteSpace(updatedOwner.Email)) ? updatedOwner.Email : ownerdb.Email;
+        ownerdb.Address = (ownerdb.Address != updatedOwner.Address && !string.IsNullOrWhiteSpace(updatedOwner.Address)) ? updatedOwner.Address : ownerdb.Address;
+        ownerdb.PhoneNumber = (ownerdb.PhoneNumber != updatedOwner.PhoneNumber && !string.IsNullOrWhiteSpace(updatedOwner.PhoneNumber)) ? updatedOwner.PhoneNumber : ownerdb.PhoneNumber;
+
+        try
         {
-            return new PropertyCustomResponse
-            {
-                Status = 1,
-                Message = "Property owner not found."
-            };
+            db.SaveChanges();
+            return new PropertyCustomResponse { Status = 0, Message = $"Property owner with name: {ownerdb.FirstName} {ownerdb.LastName} updated successfully." };
         }
-
-        // Checking for unique VAT if it is changed
-        if (owner.VAT != ownerdb.VAT && db.PropertyOwners.Any(o => o.VAT == owner.VAT))
+        catch (Exception e)
         {
-            return new PropertyCustomResponse
-            {
-                Status = 1,
-                Message = "Update failed. A property owner with this VAT already exists."
-            };
+            return new PropertyCustomResponse { Status = 1, Message = $"Owner update failed due to a database error: '{e.Message}'" };
         }
-
-        //only update field when it has different value from db entry and not null
-        ownerdb.VAT = (ownerdb.VAT != owner.VAT && !string.IsNullOrWhiteSpace(owner.VAT)) ? owner.VAT : ownerdb.VAT;
-        ownerdb.FirstName = (ownerdb.FirstName != owner.FirstName && !string.IsNullOrWhiteSpace(owner.FirstName)) ? owner.FirstName : ownerdb.FirstName;
-        ownerdb.LastName = (ownerdb.LastName != owner.LastName && !string.IsNullOrWhiteSpace(owner.LastName)) ? owner.LastName : ownerdb.LastName;
-        ownerdb.Email = (ownerdb.Email != owner.Email && !string.IsNullOrWhiteSpace(owner.Email)) ? owner.Email : ownerdb.Email;
-        ownerdb.Address = (ownerdb.Address != owner.Address && !string.IsNullOrWhiteSpace(owner.Address)) ? owner.Address : ownerdb.Address;
-        ownerdb.PhoneNumber = (ownerdb.PhoneNumber != owner.PhoneNumber && !string.IsNullOrWhiteSpace(owner.PhoneNumber)) ? owner.PhoneNumber : ownerdb.PhoneNumber;
-
-        db.SaveChanges();
-
-        return new PropertyCustomResponse
-        {
-            Status = 0,
-            Message = $"Property owner with name: {ownerdb.FirstName} {ownerdb.LastName} updated successfully."
-        };
     }
 
-    // Deletes an owner based on his id - Εφόσον ο Property Owner αναφέρει τα GDPR, χρησιμοποιώ μόνο hard delete
+    // Deletes an owner based on his id - Εφόσον στο Property Owner Entity αναφέρονται τα GDPR, χρησιμοποιώ μόνο hard delete
     public PropertyCustomResponse DeletePropertyOwner(int id)
     {
         PropertyOwner? ownerdb = db.PropertyOwners
@@ -167,14 +157,7 @@ public class PropertyOwnerService
                     .ThenInclude(pi => pi.Repairs)
                     .FirstOrDefault(o => o.Id == id);
 
-        if (ownerdb == null)
-        {
-            return new PropertyCustomResponse
-            {
-                Status = 1,
-                Message = "Property owner was not found."
-            };
-        }
+        if (ownerdb == null) return new PropertyCustomResponse { Status = 1, Message = "Property owner was not found." };
 
         // Soft Delete στα repairs του owner για να μην έχουμε απώλειες στο repairs history όταν διαγράφεται ο χρήστης
         foreach (var propertyItem in ownerdb.PropertyItems)
@@ -195,9 +178,6 @@ public class PropertyOwnerService
         db.PropertyOwners.Remove(ownerdb); // Hard delete τον PropertyOwner
         db.SaveChanges();
 
-        return new PropertyCustomResponse { 
-            Status = 0,
-            Message = $"Property owner {ownerdb.FirstName} {ownerdb.LastName} and his associated property items were deleted successfully."
-        };
+        return new PropertyCustomResponse { Status = 0, Message = $"Property owner {ownerdb.FirstName} {ownerdb.LastName} and his associated property items were deleted successfully." };
     }
 }
